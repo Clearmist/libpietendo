@@ -25,7 +25,7 @@ pie::ctr::CciFsShapshotGenerator::CciFsShapshotGenerator(const std::shared_ptr<t
 
 	// validate and read CCI header
 	pie::ctr::CciHeader hdr;
-	if (mBaseStream->length() < sizeof(pie::ctr::CciHeader))
+	if (mBaseStream->length() < int64_t(sizeof(pie::ctr::CciHeader)))
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::CciFsShapshotGenerator", "Input stream is too small.");
 	}
@@ -56,7 +56,7 @@ pie::ctr::CciFsShapshotGenerator::CciFsShapshotGenerator(const std::shared_ptr<t
 		int64_t size;
 		uint64_t title_id;
 	};
-	
+
 	std::array<PartitionInformation, pie::ctr::NcsdCommonHeader::kPartitionNum> partition;
 
 	int64_t used_image_size = 0;

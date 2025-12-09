@@ -14,7 +14,7 @@ pie::ctr::es::TitleMetaDataDeserialiser::TitleMetaDataDeserialiser(const std::sh
 		throw tc::ArgumentNullException(mModuleLabel, "TMD stream was null.");
 	}
 
-	if (tmd_stream->length() < (sizeof(pie::es::ESV1TitleMeta) + sizeof(pie::es::ESV1ContentMeta)))
+	if (tmd_stream->length() < int64_t(sizeof(pie::es::ESV1TitleMeta) + sizeof(pie::es::ESV1ContentMeta)))
 	{
 		throw tc::ArgumentOutOfRangeException(mModuleLabel, "TMD was too small.");
 	}
@@ -131,7 +131,7 @@ pie::ctr::es::TitleMetaDataDeserialiser::TitleMetaDataDeserialiser(const std::sh
 	this->ctr_custom_data.save_data_size = custom_data->ctr.save_data_size;
 	this->ctr_custom_data.is_snake_only = custom_data->ctr.flag.test(0);
 
-	// process ESV1ContentMeta entries 
+	// process ESV1ContentMeta entries
 	for (size_t i = 0; i < cmd_table_num; i++)
 	{
 		this->content_info.push_back(ContentInfo(

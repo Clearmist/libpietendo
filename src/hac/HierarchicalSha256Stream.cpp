@@ -42,8 +42,8 @@ pie::hac::HierarchicalSha256Stream::HierarchicalSha256Stream(const std::shared_p
 	// import layers
 	struct LayerInfo
 	{
-		int64_t offset;
-		int64_t size;
+		int64_t offset = 0;
+		int64_t size = 0;
 	};
 
 	std::vector<LayerInfo> hash_layer;
@@ -66,7 +66,7 @@ pie::hac::HierarchicalSha256Stream::HierarchicalSha256Stream(const std::shared_p
 
 			hash_layer.push_back({ raw_layer.offset, raw_layer.size });
 		}
-			
+
 	}
 
 	// validate hash layers
@@ -128,13 +128,13 @@ size_t pie::hac::HierarchicalSha256Stream::read(byte_t* ptr, size_t count)
 	{
 		throw tc::ObjectDisposedException(mModuleLabel+"::read()", "Failed to read from stream (stream is disposed)");
 	}
-	
+
 	// track read_count
 	size_t data_read_count = 0;
 
 	// get predicted read count
 	count = tc::io::IOUtil::getReadableCount(this->length(), this->position(), count);
-	
+
 	// if count is 0 just return
 	if (count == 0) return data_read_count;
 
@@ -186,7 +186,7 @@ size_t pie::hac::HierarchicalSha256Stream::read(byte_t* ptr, size_t count)
 	fmt::print("begin_aligned_offset:   0x{:x}\n", begin_aligned_offset);
 	fmt::print("end_aligned_offset:     0x{:x}\n", end_aligned_offset);
 	fmt::print("block_num:              0x{:x}\n", block_num);
-	
+
 	fmt::print("partial_begin:\n");
 	fmt::print("  read_block:           {}\n", read_partial_begin_block);
 	fmt::print("  block:                0x{:x}\n", partial_begin_block);
@@ -203,7 +203,7 @@ size_t pie::hac::HierarchicalSha256Stream::read(byte_t* ptr, size_t count)
 	fmt::print("  block:                0x{:x}\n", continuous_begin_block);
 	fmt::print("  block_num:            0x{:x}\n", continuous_block_num);
 	*/
-	
+
 
 	if (block_num == 0)
 	{
@@ -220,11 +220,11 @@ size_t pie::hac::HierarchicalSha256Stream::read(byte_t* ptr, size_t count)
 
 	// read un-aligned begin block
 	if (read_partial_begin_block)
-	{	
+	{
 		// read block
 		this->seek(blockToOffset(partial_begin_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(partial_block.data(), getSizeOfBlock(partial_begin_block));
-		
+
 		// verify block
 		if (validateLayerBlocksWithHashLayer(partial_block.data(), getSizeOfBlock(partial_begin_block), mDataStreamBlockSize, 1, getBlockHash(partial_begin_block)) == false)
 		{
@@ -244,7 +244,7 @@ size_t pie::hac::HierarchicalSha256Stream::read(byte_t* ptr, size_t count)
 		// read blocks
 		this->seek(blockToOffset(continuous_begin_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(ptr + data_read_count, continuous_block_num * mDataStreamBlockSize);
-		
+
 		// verify blocks
 		if (validateLayerBlocksWithHashLayer(ptr + data_read_count, continuous_block_num * mDataStreamBlockSize, mDataStreamBlockSize, continuous_block_num, getBlockHash(continuous_begin_block)) == false)
 		{
@@ -254,14 +254,14 @@ size_t pie::hac::HierarchicalSha256Stream::read(byte_t* ptr, size_t count)
 		// increment data read count
 		data_read_count += continuous_block_num * mDataStreamBlockSize;
 	}
-	
+
 	// read un-aligned end block
 	if (read_partial_end_block)
 	{
 		// read block
 		this->seek(blockToOffset(partial_end_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(partial_block.data(), getSizeOfBlock(partial_end_block));
-		
+
 		// verify block
 		if (validateLayerBlocksWithHashLayer(partial_block.data(), getSizeOfBlock(partial_end_block), mDataStreamBlockSize, 1, getBlockHash(partial_end_block)) == false)
 		{
@@ -293,7 +293,7 @@ int64_t pie::hac::HierarchicalSha256Stream::seek(int64_t offset, tc::io::SeekOri
 	{
 		throw tc::ObjectDisposedException(mModuleLabel+"::seek()", "Failed to set stream position (stream is disposed)");
 	}
-	
+
 	return mDataStream->seek(offset, origin);
 }
 
@@ -337,7 +337,7 @@ void pie::hac::HierarchicalSha256Stream::dispose()
 		// release ptr
 		mBaseStream.reset();
 	}
-	
+
 	// clear hash cache
 	mHashCache = tc::ByteData();
 }

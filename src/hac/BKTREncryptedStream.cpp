@@ -55,7 +55,7 @@ pie::hac::BKTREncryptedStream::BKTREncryptedStream(const std::shared_ptr<tc::io:
 	tc::crypto::Aes128CtrEncryptedStream sections_reader(stream, key, counter);
 
 	// validate and read indirect section
-	if (sections_reader.length() < patch_info.indirect_bucket.offset.unwrap() + patch_info.indirect_bucket.size.unwrap())
+	if (sections_reader.length() < int64_t(patch_info.indirect_bucket.offset.unwrap() + patch_info.indirect_bucket.size.unwrap()))
 	{
 		throw tc::ArgumentOutOfRangeException(kClassName, "Input stream is too small.");
 	}
@@ -67,7 +67,7 @@ pie::hac::BKTREncryptedStream::BKTREncryptedStream(const std::shared_ptr<tc::io:
 	// Prepare base reader (from base NCA) and patch reader (from update NCA)
 	mBaseReader = base;
 	mPatchReader = std::make_shared<pie::hac::BKTRSubsectionEncryptedStream>(pie::hac::BKTRSubsectionEncryptedStream(stream, key, counter, patch_info.aes_ctr_ex_bucket));
-	
+
 	mLength = indirect_block->header.total_size;
 	int64_t end_virtual_offset = indirect_block->header.total_size;
 
@@ -87,7 +87,7 @@ pie::hac::BKTREncryptedStream::BKTREncryptedStream(const std::shared_ptr<tc::io:
 
 			IndirectEntry& indirect_entry = mIndirectEntries[virtual_offset];
 			// Select reader for each indirect storage entry
-			switch (entry.storage_index) 
+			switch (entry.storage_index)
 			{
 			case indirectstorage::StorageSource_BaseRomFs:
 				indirect_entry.reader = mBaseReader;
@@ -156,7 +156,7 @@ size_t pie::hac::BKTREncryptedStream::read(byte_t* ptr, size_t count)
 
 	// get predicted read count
 	count = tc::io::IOUtil::getReadableCount(this->length(), this->position(), count);
-	
+
 	// if count is 0 just return
 	if (count == 0) return data_read_count;
 
@@ -181,7 +181,7 @@ size_t pie::hac::BKTREncryptedStream::read(byte_t* ptr, size_t count)
 	int64_t count_first_relocation = count;
 	int64_t end_first_relocation = entry.virtual_offset + entry.size;
 
-	// check 
+	// check
 	if (end_read_offset > end_first_relocation)
 	{
 		// Read for first relocation
@@ -192,7 +192,7 @@ size_t pie::hac::BKTREncryptedStream::read(byte_t* ptr, size_t count)
 	reader->seek(physical_reader_offset, tc::io::SeekOrigin::Begin);
 	data_read_count += reader->read(ptr, count_first_relocation);
 
-	if (count_first_relocation != count)
+	if (count_first_relocation != int64_t(count))
 	{
 		// update position to continue reading
 		this->seek(count_first_relocation, tc::io::SeekOrigin::Current);

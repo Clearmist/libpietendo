@@ -31,7 +31,7 @@ pie::ctr::RomFsSnapshotGenerator::RomFsSnapshotGenerator(const std::shared_ptr<t
 
 	// validate and read ROMFS header
 	pie::ctr::RomFsHeader hdr;
-	if (mBaseStream->length() < sizeof(pie::ctr::RomFsHeader))
+	if (mBaseStream->length() < int64_t(sizeof(pie::ctr::RomFsHeader)))
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::RomFsSnapshotGenerator", "Input stream is too small.");
 	}
@@ -193,7 +193,7 @@ pie::ctr::RomFsSnapshotGenerator::RomFsSnapshotGenerator(const std::shared_ptr<t
 			// add name to parent directory listing
 			dir_entries[parent_index].dir_listing.dir_list.push_back(utf8_string);
 		}
-		
+
 
 		uint32_t entry_total_size = sizeof(pie::ctr::RomFsDirectoryEntry) + align<uint32_t>(getDirEntry(v_addr)->name_size.unwrap(), 4);
 
@@ -260,7 +260,7 @@ pie::ctr::RomFsSnapshotGenerator::RomFsSnapshotGenerator(const std::shared_ptr<t
 
 		v_addr += total_size;
 	}
-	
+
 	// old style recursive add
 	//addDirectory(getDirEntry(0), 0);
 }
@@ -351,14 +351,13 @@ void pie::ctr::RomFsSnapshotGenerator::addDirectory(const pie::ctr::RomFsDirecto
 		// add name to parent directory listing
 		dir_entries[parent_dir].dir_listing.dir_list.push_back(utf8_string);
 	}
-	
-	
+
 	// get cur_dir pointer
 	auto cur_dir = dir_entries.size() - 1;
-	
+
 	// add file children
 	for (uint32_t child = dir_entry->file_offset.unwrap();
-	    child != 0xffffffff; 
+	    child != 0xffffffff;
 	    child = getFileEntry(child)->sibling_offset.unwrap())
 	{
 		//std::cout << "file child addr :" << std::hex << std::setw(8) << std::setfill('0') << child << std::endl;
@@ -367,9 +366,9 @@ void pie::ctr::RomFsSnapshotGenerator::addDirectory(const pie::ctr::RomFsDirecto
 
 	// add dir children
 	for (uint32_t child = dir_entry->child_offset.unwrap();
-	    child != 0xffffffff; 
+	    child != 0xffffffff;
 	    child = getDirEntry(child)->sibling_offset.unwrap())
 	{
 		addDirectory(getDirEntry(child), cur_dir);
-	}	
+	}
 }

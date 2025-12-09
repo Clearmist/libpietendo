@@ -46,10 +46,10 @@ pie::hac::HierarchicalIntegrityStream::HierarchicalIntegrityStream(const std::sh
 	// import layers
 	struct LayerInfo
 	{
-		int64_t offset;
-		int64_t size;
-		size_t block_size;
-		size_t block_num;
+		int64_t offset = 0;
+		int64_t size = 0;
+		size_t block_size = 0;
+		size_t block_num = 0;
 	};
 
 	std::vector<LayerInfo> hash_layer;
@@ -77,7 +77,7 @@ pie::hac::HierarchicalIntegrityStream::HierarchicalIntegrityStream(const std::sh
 
 			hash_layer.push_back({ raw_layer.offset, raw_layer.size, size_t(raw_layer.block_size), size_t((raw_layer.size + (raw_layer.block_size-1))/raw_layer.block_size) });
 		}
-			
+
 	}
 
 	// validate hash layers
@@ -139,13 +139,13 @@ size_t pie::hac::HierarchicalIntegrityStream::read(byte_t* ptr, size_t count)
 	{
 		throw tc::ObjectDisposedException(mModuleLabel+"::read()", "Failed to read from stream (stream is disposed)");
 	}
-	
+
 	// track read_count
 	size_t data_read_count = 0;
 
 	// get predicted read count
 	count = tc::io::IOUtil::getReadableCount(this->length(), this->position(), count);
-	
+
 	// if count is 0 just return
 	if (count == 0) return data_read_count;
 
@@ -197,7 +197,7 @@ size_t pie::hac::HierarchicalIntegrityStream::read(byte_t* ptr, size_t count)
 	fmt::print("begin_aligned_offset:   0x{:x}\n", begin_aligned_offset);
 	fmt::print("end_aligned_offset:     0x{:x}\n", end_aligned_offset);
 	fmt::print("block_num:              0x{:x}\n", block_num);
-	
+
 	fmt::print("partial_begin:\n");
 	fmt::print("  read_block:           {}\n", read_partial_begin_block);
 	fmt::print("  block:                0x{:x}\n", partial_begin_block);
@@ -230,11 +230,11 @@ size_t pie::hac::HierarchicalIntegrityStream::read(byte_t* ptr, size_t count)
 
 	// read un-aligned begin block
 	if (read_partial_begin_block)
-	{	
+	{
 		// read block
 		this->seek(blockToOffset(partial_begin_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(partial_block.data(), partial_block.size());
-		
+
 		// verify block
 		if (validateLayerBlocksWithHashLayer(partial_block.data(), mDataStreamBlockSize, 1, getBlockHash(partial_begin_block)) == false)
 		{
@@ -254,7 +254,7 @@ size_t pie::hac::HierarchicalIntegrityStream::read(byte_t* ptr, size_t count)
 		// read blocks
 		this->seek(blockToOffset(continuous_begin_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(ptr + data_read_count, continuous_block_num * mDataStreamBlockSize);
-		
+
 		// verify blocks
 		if (validateLayerBlocksWithHashLayer(ptr + data_read_count, mDataStreamBlockSize, continuous_block_num, getBlockHash(continuous_begin_block)) == false)
 		{
@@ -264,7 +264,7 @@ size_t pie::hac::HierarchicalIntegrityStream::read(byte_t* ptr, size_t count)
 		// increment data read count
 		data_read_count += continuous_block_num * mDataStreamBlockSize;
 	}
-	
+
 	// read un-aligned end block
 	if (read_partial_end_block)
 	{
@@ -276,7 +276,7 @@ size_t pie::hac::HierarchicalIntegrityStream::read(byte_t* ptr, size_t count)
 		if (data_read < partial_block.size()) {
 			memset(partial_block.data() + data_read, 0, partial_block.size() - data_read);
 		}
-		
+
 		// verify block
 		if (validateLayerBlocksWithHashLayer(partial_block.data(), mDataStreamBlockSize, 1, getBlockHash(partial_end_block)) == false)
 		{
@@ -308,7 +308,7 @@ int64_t pie::hac::HierarchicalIntegrityStream::seek(int64_t offset, tc::io::Seek
 	{
 		throw tc::ObjectDisposedException(mModuleLabel+"::seek()", "Failed to set stream position (stream is disposed)");
 	}
-	
+
 	return mDataStream->seek(offset, origin);
 }
 
@@ -352,7 +352,7 @@ void pie::hac::HierarchicalIntegrityStream::dispose()
 		// release ptr
 		mBaseStream.reset();
 	}
-	
+
 	// clear hash cache
 	mHashCache = tc::ByteData();
 }
@@ -385,7 +385,7 @@ bool pie::hac::HierarchicalIntegrityStream::validateLayerBlocksWithHashLayer(con
 			//fmt::print("BadBlock:\n");
 			//fmt::print("{:s}", tc::cli::FormatUtil::formatBytesAsHxdHexString(blk_ptr, blk_size));
 		}
-		
+
 	}
 
 	return bad_block == 0;

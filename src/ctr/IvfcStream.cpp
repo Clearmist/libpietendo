@@ -41,7 +41,7 @@ pie::ctr::IvfcStream::IvfcStream(const std::shared_ptr<tc::io::IStream>& stream)
 	}
 
 	// validate and read IVFC header
-	if (mBaseStream->length() < sizeof(pie::ctr::IvfcCtrRomfsHeader))
+	if (mBaseStream->length() < int64_t(sizeof(pie::ctr::IvfcCtrRomfsHeader)))
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::IvfcStream", "stream is too small.");
 	}
@@ -74,7 +74,7 @@ pie::ctr::IvfcStream::IvfcStream(const std::shared_ptr<tc::io::IStream>& stream)
 		size_t block_size;
 		size_t block_num;
 	};
-	
+
 	std::array<LevelInfo, 4> section;
 
 	for (size_t i = 0; i < section.size(); i++)
@@ -100,7 +100,7 @@ pie::ctr::IvfcStream::IvfcStream(const std::shared_ptr<tc::io::IStream>& stream)
 			section[i].size = int64_t(hdr.level[i-1].size.unwrap());
 			section[i].block_size = size_t(size_t(1) << size_t(hdr.level[i-1].block_size_log2.unwrap()));
 			section[i].block_num = size_t(section[i].size / int64_t(section[i].block_size)) + (size_t(section[i].size % int64_t(section[i].block_size)) ? 1 : 0);
-		
+
 			/*
 			std::cout << "i: " << std::dec << i << std::endl;
 			std::cout << "size :           " << std::dec << section[i].size << std::endl;
@@ -131,15 +131,15 @@ pie::ctr::IvfcStream::IvfcStream(const std::shared_ptr<tc::io::IStream>& stream)
 	}
 
 	// validate hash tree
-	if ((section[DataLevel2].block_num * tc::crypto::Sha2256Generator::kHashSize) != section[HashLevel1].size)
+	if (int64_t(section[DataLevel2].block_num * tc::crypto::Sha2256Generator::kHashSize) != section[HashLevel1].size)
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::IvfcStream", "IVFC level1 hash table had unexpected size.");
 	}
-	if ((section[HashLevel1].block_num * tc::crypto::Sha2256Generator::kHashSize) != section[HashLevel0].size)
+	if (int64_t(section[HashLevel1].block_num * tc::crypto::Sha2256Generator::kHashSize) != section[HashLevel0].size)
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::IvfcStream", "IVFC level0 hash table had unexpected size.");
 	}
-	if ((section[HashLevel0].block_num * tc::crypto::Sha2256Generator::kHashSize) != section[MasterHash].size)
+	if (int64_t(section[HashLevel0].block_num * tc::crypto::Sha2256Generator::kHashSize) != section[MasterHash].size)
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::IvfcStream", "IVFC master hash table had unexpected size.");
 	}
@@ -167,7 +167,7 @@ pie::ctr::IvfcStream::IvfcStream(const std::shared_ptr<tc::io::IStream>& stream)
 	std::cout << "Level 1:" << std::endl;
 	std::cout << tc::cli::FormatUtil::formatBytesAsHxdHexString(hash_level1_data);
 	*/
-	
+
 
 	// validate level0
 	if (validateLayerBlocksWithHashLayer(hash_level0_data.data(), section[HashLevel0].block_size, section[HashLevel0].block_num, master_hash_data.data()) == false)
@@ -220,13 +220,13 @@ size_t pie::ctr::IvfcStream::read(byte_t* ptr, size_t count)
 	{
 		throw tc::ObjectDisposedException(mModuleLabel+"::read()", "Failed to read from stream (stream is disposed)");
 	}
-	
+
 	// track read_count
 	size_t data_read_count = 0;
 
 	// get predicted read count
 	count = tc::io::IOUtil::getReadableCount(this->length(), this->position(), count);
-	
+
 	// if count is 0 just return
 	if (count == 0) return data_read_count;
 
@@ -278,7 +278,7 @@ size_t pie::ctr::IvfcStream::read(byte_t* ptr, size_t count)
 	std::cout << "begin_aligned_offset:   0x" << std::hex << begin_aligned_offset << std::endl;
 	std::cout << "end_aligned_offset:     0x" << std::hex << end_aligned_offset << std::endl;
 	std::cout << "block_num:              0x" << std::hex << block_num << std::endl;
-	
+
 	std::cout << "partial_begin:" << std::endl;
 	std::cout << "  read_block:           " << std::boolalpha << read_partial_begin_block << std::endl;
 	std::cout << "  block:                0x" << std::hex << partial_begin_block << std::endl;
@@ -311,11 +311,11 @@ size_t pie::ctr::IvfcStream::read(byte_t* ptr, size_t count)
 
 	// read un-aligned begin block
 	if (read_partial_begin_block)
-	{	
+	{
 		// read block
 		this->seek(blockToOffset(partial_begin_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(partial_block.data(), partial_block.size());
-		
+
 		// verify block
 		if (validateLayerBlocksWithHashLayer(partial_block.data(), mDataStreamBlockSize, 1, getBlockHash(partial_begin_block)) == false)
 		{
@@ -335,7 +335,7 @@ size_t pie::ctr::IvfcStream::read(byte_t* ptr, size_t count)
 		// read blocks
 		this->seek(blockToOffset(continuous_begin_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(ptr + data_read_count, continuous_block_num * mDataStreamBlockSize);
-		
+
 		// verify blocks
 		if (validateLayerBlocksWithHashLayer(ptr + data_read_count, mDataStreamBlockSize, continuous_block_num, getBlockHash(continuous_begin_block)) == false)
 		{
@@ -345,14 +345,14 @@ size_t pie::ctr::IvfcStream::read(byte_t* ptr, size_t count)
 		// increment data read count
 		data_read_count += continuous_block_num * mDataStreamBlockSize;
 	}
-	
+
 	// read un-aligned end block
 	if (read_partial_end_block)
 	{
 		// read block
 		this->seek(blockToOffset(partial_end_block), tc::io::SeekOrigin::Begin);
 		mDataStream->read(partial_block.data(), partial_block.size());
-		
+
 		// verify block
 		if (validateLayerBlocksWithHashLayer(partial_block.data(), mDataStreamBlockSize, 1, getBlockHash(partial_end_block)) == false)
 		{
@@ -384,7 +384,7 @@ int64_t pie::ctr::IvfcStream::seek(int64_t offset, tc::io::SeekOrigin origin)
 	{
 		throw tc::ObjectDisposedException(mModuleLabel+"::seek()", "Failed to set stream position (stream is disposed)");
 	}
-	
+
 	return mDataStream->seek(offset, origin);
 }
 
@@ -428,7 +428,7 @@ void pie::ctr::IvfcStream::dispose()
 		// release ptr
 		mBaseStream.reset();
 	}
-	
+
 	// clear hash cache
 	mHashCache = tc::ByteData();
 }
@@ -461,7 +461,7 @@ bool pie::ctr::IvfcStream::validateLayerBlocksWithHashLayer(const byte_t* layer,
 			//std::cout << "BadBlock:" << std::endl;
 			//std::cout << tc::cli::FormatUtil::formatBytesAsHxdHexString(blk_ptr, block_size);
 		}
-		
+
 	}
 
 	return bad_block == 0;

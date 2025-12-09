@@ -16,7 +16,7 @@ pie::ctr::es::TicketDeserialiser::TicketDeserialiser(const std::shared_ptr<tc::i
 		throw tc::ArgumentNullException(mModuleLabel, "Stream was null.");
 	}
 
-	if (tik_stream->length() < sizeof(pie::es::ESV1Ticket))
+	if (tik_stream->length() < int64_t(sizeof(pie::es::ESV1Ticket)))
 	{
 		throw tc::ArgumentOutOfRangeException(mModuleLabel, "Stream was too small to import ticket.");
 	}
@@ -117,7 +117,7 @@ pie::ctr::es::TicketDeserialiser::TicketDeserialiser(const std::shared_ptr<tc::i
 		fmt::print(" flags:           {:04x}\n", tik->sectHdrs[i].flags.unwrap());
 	}
 	*/
-	
+
 
 	struct TicketReservedForCtr
 	{
@@ -149,7 +149,7 @@ pie::ctr::es::TicketDeserialiser::TicketDeserialiser(const std::shared_ptr<tc::i
 	// process data from reserved field
 	auto custom_data = (TicketReservedForCtr*)tik->head.reserved.data();
 	this->ec_account_id = custom_data->ec_account_id.unwrap();
-	
+
 	// find the demo launch limit
 	for (size_t i = 0; i < tik->head.limits.size(); i++)
 	{
@@ -174,7 +174,7 @@ pie::ctr::es::TicketDeserialiser::TicketDeserialiser(const std::shared_ptr<tc::i
 				tc::bn::bitarray<0x80>* access_mask = (tc::bn::bitarray<0x80>*)content_records[j].accessMask.data();
 				for (size_t bit = 0; bit < access_mask->bit_size(); bit++)
 				{
-					if (access_mask->test(bit)) 
+					if (access_mask->test(bit))
 					{
 						this->enabled_content.set(content_records[j].offset.unwrap() + bit);
 					}

@@ -26,7 +26,7 @@ pie::ctr::CiaFsSnapshotGenerator::CiaFsSnapshotGenerator(const std::shared_ptr<t
 
 	// validate and read CIA header
 	pie::ctr::CiaHeader hdr;
-	if (mBaseStream->length() < sizeof(pie::ctr::CiaHeader))
+	if (mBaseStream->length() < int64_t(sizeof(pie::ctr::CiaHeader)))
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::CiaFsSnapshotGenerator", "Input stream is too small.");
 	}
@@ -63,7 +63,7 @@ pie::ctr::CiaFsSnapshotGenerator::CiaFsSnapshotGenerator(const std::shared_ptr<t
 		int64_t offset;
 		int64_t size;
 	};
-	
+
 	std::array<CiaSectionInformation, 6> section;
 
 	section[Header].size = hdr.header_size.unwrap();
@@ -110,20 +110,18 @@ pie::ctr::CiaFsSnapshotGenerator::CiaFsSnapshotGenerator(const std::shared_ptr<t
 	}
 	if (section[Footer].size != 0)
 	{
-		addFile("footer", section[Footer].offset, section[Footer].size);	
+		addFile("footer", section[Footer].offset, section[Footer].size);
 	}
 	if (section[Content].size != 0)
 	{
 		// if TMD exists, add the (included) <cid>.app files to the file system
 		if (section[Tmd].size != 0)
 		{
-			// test size before reading
-			if (section[Tmd].size < (sizeof(pie::es::ESV1TitleMeta) + sizeof(pie::es::ESV1ContentMeta)))
-			{
-				throw tc::ArgumentOutOfRangeException("pie::ctr::CiaFsSnapshotGenerator", "TMD was too small.");
-			}
-
-			// import TMD v1 data
+		// test size before reading
+		if (section[Tmd].size < int64_t(sizeof(pie::es::ESV1TitleMeta) + sizeof(pie::es::ESV1ContentMeta)))
+		{
+			throw tc::ArgumentOutOfRangeException("pie::ctr::CiaFsSnapshotGenerator", "TMD was too small.");
+		}			// import TMD v1 data
 			if (tc::is_int64_t_too_large_for_size_t(section[Tmd].size))
 			{
 				throw tc::ArgumentOutOfRangeException("pie::ctr::CiaFsSnapshotGenerator", "TMD was too large to read into memory.");
@@ -185,7 +183,7 @@ pie::ctr::CiaFsSnapshotGenerator::CiaFsSnapshotGenerator(const std::shared_ptr<t
 			{
 				throw tc::ArgumentOutOfRangeException("pie::ctr::CiaFsSnapshotGenerator", "TMD had invalid CMD group[0] hash.");
 			}
-	
+
 			int64_t content_offset = 0;
 			for (size_t i = 0; i < cmd_table_num; i++)
 			{
@@ -197,14 +195,14 @@ pie::ctr::CiaFsSnapshotGenerator::CiaFsSnapshotGenerator(const std::shared_ptr<t
 				std::cout << "size(" << std::hex << std::setfill('0') << std::setw(16) << tmd->contents[i].size.unwrap() << "), ";
 				std::cout << "" << std::endl;
 				*/
-				if (hdr.content_bitarray.test(tmd->contents[i].index.unwrap()))				
+				if (hdr.content_bitarray.test(tmd->contents[i].index.unwrap()))
 				{
 					std::string content_file_name = fmt::format("{:08x}.app", i, tmd->contents[i].cid.unwrap());
 
 					int64_t content_size = align<int64_t>(tmd->contents[i].size.unwrap(), CiaHeader::kCiaContentAlignment);
 
 					addFile(content_file_name, section[Content].offset + content_offset, content_size);
-					
+
 					content_offset += content_size;
 				}
 			}

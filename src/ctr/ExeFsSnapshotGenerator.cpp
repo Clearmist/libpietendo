@@ -26,7 +26,7 @@ pie::ctr::ExeFsSnapshotGenerator::ExeFsSnapshotGenerator(const std::shared_ptr<t
 
 	// validate and read EXEFS header
 	pie::ctr::ExeFsHeader hdr;
-	if (stream->length() < sizeof(pie::ctr::ExeFsHeader))
+	if (stream->length() < int64_t(sizeof(pie::ctr::ExeFsHeader)))
 	{
 		throw tc::ArgumentOutOfRangeException("pie::ctr::ExeFsSnapshotGenerator", "Input stream is too small.");
 	}

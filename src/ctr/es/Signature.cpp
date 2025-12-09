@@ -65,7 +65,7 @@ pie::ctr::es::SignatureDeserialiser::SignatureDeserialiser(const std::shared_ptr
 	}
 
 	// must have at least 4 bytes for signature magic code
-	if (stream->length() < sizeof(uint32_t))
+	if (stream->length() < int64_t(sizeof(uint32_t)))
 	{
 		throw tc::ArgumentOutOfRangeException(mModuleLabel, "Stream was too small to import signature.");
 	}

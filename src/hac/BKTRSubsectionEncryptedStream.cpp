@@ -49,7 +49,7 @@ pie::hac::BKTRSubsectionEncryptedStream::BKTRSubsectionEncryptedStream(const std
 	tc::crypto::Aes128CtrEncryptedStream sections_reader(stream, key, counter);
 
 	// validate and read subsection header
-	if (sections_reader.length() < bucket_info.offset.unwrap() + bucket_info.size.unwrap())
+	if (sections_reader.length() < int64_t(bucket_info.offset.unwrap() + bucket_info.size.unwrap()))
 	{
 		throw tc::ArgumentOutOfRangeException(kClassName, "Input stream is too small.");
 	}
@@ -90,7 +90,7 @@ pie::hac::BKTRSubsectionEncryptedStream::BKTRSubsectionEncryptedStream(const std
 
 bool pie::hac::BKTRSubsectionEncryptedStream::canRead() const
 {
-	for (auto stream : mStreams) 
+	for (auto stream : mStreams)
 	{
 		if (!stream->canRead())
 			return false;
@@ -129,7 +129,7 @@ size_t pie::hac::BKTRSubsectionEncryptedStream::read(byte_t* ptr, size_t count)
 
 	// get predicted read count
 	count = tc::io::IOUtil::getReadableCount(this->length(), this->position(), count);
-	
+
 	// if count is 0 just return
 	if (count == 0) return data_read_count;
 
@@ -163,7 +163,7 @@ size_t pie::hac::BKTRSubsectionEncryptedStream::read(byte_t* ptr, size_t count)
 	data_read_count += reader->read(ptr, count_partial_read);
 
 	// reads from diferent subsections
-	if (count_partial_read != count)
+	if (count_partial_read != int64_t(count))
 	{
 		seek(count_partial_read, tc::io::SeekOrigin::Current);
 		// read remeaning data (recursively)
