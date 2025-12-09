@@ -100,15 +100,15 @@ enum ESV2TitleKeyType : byte_t
 
 #pragma pack(push, 4)
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(disable : 4200) // silence warnings for usage of empty arrays in stucts
 #endif
 
 
 	/**
 	 * @brief This struct describes a limited play restriction
-	 * @details 
-	 * 
+	 * @details
+	 *
 	 * * __code__ Describes the limitation type @ref pie::es::ESLimitCode.
 	 * * __limit__ Integer representation of the limitation (seconds, launch count, etc).
 	 */
@@ -297,7 +297,7 @@ struct ESV2SectionHeader
 };
 static_assert(sizeof(ESV2SectionHeader) == 16, "ESV2SectionHeader size");
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(default : 4200)
 #endif
 

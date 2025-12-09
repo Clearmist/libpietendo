@@ -89,14 +89,14 @@ static const size_t ES_MAX_CMDS_IN_GROUP = 1024;
 
 #pragma pack(push, 4)
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(disable : 4200) // silence warnings for usage of empty arrays in stucts
 #endif
 
 	/**
 	 * @brief ContentMetaData (format v0)
-	 * @details 
-	 * 
+	 * @details
+	 *
 	 * This is used with v0 TitleMetaData.
 	 */
 struct ESContentMeta
@@ -198,13 +198,13 @@ static_assert(sizeof(ESTitleMeta) == 484, "ESTitleMeta size");
 struct ESV1TitleMeta
 {
 	ESSigRsa2048        sig;            /**< RSA 2048-bit sign of the TMD header */
-	ESTitleMetaHeader   head;           /**< TMD v0 header */ 
+	ESTitleMetaHeader   head;           /**< TMD v0 header */
 	ESV1TitleMetaHeader v1Head;         /**< Extension to the v0 TMD header */
 	ESV1ContentMeta     contents[];     /**< CMD array sorted by content index */
 };
 static_assert(sizeof(ESV1TitleMeta) == 2820, "ESV1TitleMeta size");
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(default : 4200)
 #endif
 

@@ -32,7 +32,7 @@ struct RomFsHeader
 };
 static_assert(sizeof(RomFsHeader) == 0x28, "RomFsHeader had invalid size");
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(disable : 4200) // silence warnings for usage of empty arrays in stucts (for name[])
 #endif
 
@@ -60,7 +60,7 @@ struct RomFsFileEntry
 };
 static_assert(sizeof(RomFsFileEntry) == 0x20, "RomFsFileEntry had invalid size");
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(default : 4200)
 #endif
 
