@@ -42,8 +42,11 @@ pie::hac::HierarchicalSha256Stream::HierarchicalSha256Stream(const std::shared_p
 	// import layers
 	struct LayerInfo
 	{
-		int64_t offset = 0;
-		int64_t size = 0;
+		int64_t offset;
+		int64_t size;
+
+		LayerInfo() : offset(0), size(0) {}
+		LayerInfo(int64_t o, int64_t s) : offset(o), size(s) {}
 	};
 
 	std::vector<LayerInfo> hash_layer;

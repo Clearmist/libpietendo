@@ -46,10 +46,13 @@ pie::hac::HierarchicalIntegrityStream::HierarchicalIntegrityStream(const std::sh
 	// import layers
 	struct LayerInfo
 	{
-		int64_t offset = 0;
-		int64_t size = 0;
-		size_t block_size = 0;
-		size_t block_num = 0;
+		int64_t offset;
+		int64_t size;
+		size_t block_size;
+		size_t block_num;
+
+		LayerInfo() : offset(0), size(0), block_size(0), block_num(0) {}
+		LayerInfo(int64_t o, int64_t s, size_t bs, size_t bn) : offset(o), size(s), block_size(bs), block_num(bn) {}
 	};
 
 	std::vector<LayerInfo> hash_layer;
