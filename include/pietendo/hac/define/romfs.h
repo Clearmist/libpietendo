@@ -35,7 +35,7 @@ struct sRomfsHeader
 };
 static_assert(sizeof(sRomfsHeader) == 0x50, "sRomfsHeader size.");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4200) // silence warnings for usage of empty arrays in stucts (for char name[];)
 #endif
 
@@ -63,7 +63,7 @@ struct sRomfsFileEntry
 };
 static_assert(sizeof(sRomfsFileEntry) == 0x20, "sRomfsFileEntry size.");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(default : 4200)
 #endif
 

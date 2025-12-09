@@ -42,7 +42,7 @@ struct sAesCtrExStorageBucket
 };
 static_assert(sizeof(sAesCtrExStorageBucket) == aesctrexstorage::kNodeSize, "sAesCtrExStorageBucket size.");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4200) // silence warnings for usage of empty arrays in stucts 
 #endif
 
@@ -58,7 +58,7 @@ struct sAesCtrExStorageBlock
 };
 static_assert(sizeof(sAesCtrExStorageBlock) == 0x4000, "sAesCtrExStorageBlock size.");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(default : 4200)
 #endif
 

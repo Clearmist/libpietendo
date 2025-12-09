@@ -47,7 +47,7 @@ struct sIndirectStorageBucket
 };
 static_assert(sizeof(sIndirectStorageBucket) == indirectstorage::kNodeSize, "sIndirectStorageBucket size.");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4200) // silence warnings for usage of empty arrays in stucts 
 #endif
 
@@ -63,7 +63,7 @@ struct sIndirectStorageBlock
 };
 static_assert(sizeof(sIndirectStorageBlock) == 0x4000, "sIndirectStorageBlock size.");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma warning(default : 4200)
 #endif
 
