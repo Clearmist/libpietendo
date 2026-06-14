@@ -102,7 +102,8 @@ void pie::hac::PartitionFsHeader::toBytes()
             raw_files[i].size.wrap(mFileList[i].size);
             raw_files[i].name_offset.wrap(uint32_t(raw_name_table_pos));
 
-            strcpy(raw_name_table + raw_name_table_pos, mFileList[i].name.c_str());
+            size_t file_name_size = mFileList[i].name.length() + 1;
+            memcpy(raw_name_table + raw_name_table_pos, mFileList[i].name.c_str(), file_name_size);
             raw_name_table_pos += (uint32_t)(mFileList[i].name.length() + 1);
         }
     }
@@ -134,7 +135,8 @@ void pie::hac::PartitionFsHeader::toBytes()
             raw_files[i].hash_protected_size.wrap(uint32_t(mFileList[i].hash_protected_size));
             raw_files[i].hash = mFileList[i].hash;
 
-            strcpy(raw_name_table + raw_name_table_pos, mFileList[i].name.c_str());
+            size_t file_name_size = mFileList[i].name.length() + 1;
+            memcpy(raw_name_table + raw_name_table_pos, mFileList[i].name.c_str(), file_name_size);
             raw_name_table_pos += mFileList[i].name.length() + 1;
         }
     }

@@ -92,8 +92,9 @@ pie::hac::BKTRSubsectionEncryptedStream::BKTRSubsectionEncryptedStream(
             const pie::hac::sAesCtrExStorageEntry &entry = subsection.entries[j];
             uint32_t newGeneration = entry.generation;
             int64_t subsec_offset = entry.offset;
-            int64_t end_offset = (j + 1 == subsection.header.entry_count) ? subsection.header.end_offset_bucket
-                                                                          : subsection.entries[j + 1].offset;
+            int64_t end_offset = (j + 1 == subsection.header.entry_count)
+                ? castUint64ToInt64(subsection.header.end_offset_bucket.unwrap())
+                : subsection.entries[j + 1].offset.unwrap();
             setGenerationAesCtr(newGeneration, new_counter.data());
             std::shared_ptr<tc::io::IStream> &reader = generationMap[entry.generation];
             if (reader == nullptr)
