@@ -6,7 +6,7 @@ project(libpietendo
 )
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Platform detection
@@ -47,7 +47,7 @@ target_include_directories(pietendo
         ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/libtoolchain/include
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/libmbedtls/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/libfmt/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libfmt/include
 )
 
 # Link dependencies
