@@ -1,13 +1,13 @@
-	/**
-	 * @file		ctr.h
-	 * @brief       Declaration of the CTR (Nintendo 3DS) library
-	 **/
+/**
+ * @file		ctr.h
+ * @brief       Declaration of the CTR (Nintendo 3DS) library
+ **/
 #pragma once
 
-	/**
-	 * @namespace   pie::ctr
-	 * @brief       Namespace of the CTR (Nintendo 3DS) library
-	 */
+/**
+ * @namespace   pie::ctr
+ * @brief       Namespace of the CTR (Nintendo 3DS) library
+ */
 
 // definitions
 #include <pietendo/ctr/cci.h>
@@ -29,7 +29,7 @@
 #include <pietendo/ctr/CtrKeyGenerator.h>
 
 // VirtualFileSystem FileSystemSnapshot generators
-#include <pietendo/ctr/ExeFsSnapshotGenerator.h>
-#include <pietendo/ctr/RomFsSnapshotGenerator.h>
 #include <pietendo/ctr/CciFsSnapshotGenerator.h>
 #include <pietendo/ctr/CiaFsSnapshotGenerator.h>
+#include <pietendo/ctr/ExeFsSnapshotGenerator.h>
+#include <pietendo/ctr/RomFsSnapshotGenerator.h>

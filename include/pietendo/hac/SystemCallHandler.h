@@ -1,42 +1,45 @@
-	/**
-	 * @file SystemCallHandler.h
-	 * @brief Declaration of pie::hac::SystemCallHandler
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/28
-	 **/
+/**
+ * @file SystemCallHandler.h
+ * @brief Declaration of pie::hac::SystemCallHandler
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/28
+ **/
 #pragma once
 #include <pietendo/hac/IKernelCapabilityHandler.h>
 
-namespace pie { namespace hac {
-	
-class SystemCallHandler :
-	public IKernelCapabilityHandler
+namespace pie
 {
-public:
-	SystemCallHandler();
+namespace hac
+{
 
-	void operator=(const SystemCallHandler& other);
-	bool operator==(const SystemCallHandler& other) const;
-	bool operator!=(const SystemCallHandler& other) const;
+class SystemCallHandler : public IKernelCapabilityHandler
+{
+  public:
+    SystemCallHandler();
 
-	// kernel capabilty list in/out
-	void importKernelCapabilityList(const std::vector<KernelCapabilityEntry>& caps);
-	void exportKernelCapabilityList(std::vector<KernelCapabilityEntry>& caps) const;
-	void clear();
-	bool isSet() const;
+    void operator=(const SystemCallHandler &other);
+    bool operator==(const SystemCallHandler &other) const;
+    bool operator!=(const SystemCallHandler &other) const;
 
-	// variables
-	const kc::SystemCallIds& getSystemCallIds() const;
-	void setSystemCallIds(const kc::SystemCallIds& syscall_ids);
+    // kernel capabilty list in/out
+    void importKernelCapabilityList(const std::vector<KernelCapabilityEntry> &caps);
+    void exportKernelCapabilityList(std::vector<KernelCapabilityEntry> &caps) const;
+    void clear();
+    bool isSet() const;
 
-private:
-	const std::string kModuleName = "SYSTEM_CALL_HANDLER";
-	static const size_t kEntrySyscallCount = 24;
-	static const size_t kSyscallTotalEntryNum = (kc::kMaxSystemCallId / kEntrySyscallCount) + 1;
+    // variables
+    const kc::SystemCallIds &getSystemCallIds() const;
+    void setSystemCallIds(const kc::SystemCallIds &syscall_ids);
 
-	bool mIsSet;
-	kc::SystemCallIds mSystemCallIds;
+  private:
+    const std::string kModuleName = "SYSTEM_CALL_HANDLER";
+    static const size_t kEntrySyscallCount = 24;
+    static const size_t kSyscallTotalEntryNum = (kc::kMaxSystemCallId / kEntrySyscallCount) + 1;
+
+    bool mIsSet;
+    kc::SystemCallIds mSystemCallIds;
 };
 
-}} // namespace pie::hac
+} // namespace hac
+} // namespace pie

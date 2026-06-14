@@ -1,20 +1,25 @@
-	/**
-	 * @file types.h
-	 * @brief Declaration of common structs and data types for the HAC library.
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/28
-	 **/
+/**
+ * @file types.h
+ * @brief Declaration of common structs and data types for the HAC library.
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/28
+ **/
 #pragma once
-#include <tc/types.h>
-#include <tc/crypto.h>
+#include <array>
 #include <cstdint>
 #include <cstring>
-#include <array>
+#include <tc/crypto.h>
+#include <tc/types.h>
 
-namespace pie { namespace hac { namespace detail {
+namespace pie
+{
+namespace hac
+{
+namespace detail
+{
 
-#pragma pack(push,1)
+#pragma pack(push, 1)
 
 using sha256_hash_t = std::array<byte_t, tc::crypto::Sha2256Generator::kHashSize>;
 
@@ -34,4 +39,6 @@ using module_id_t = std::array<byte_t, 32>;
 
 #pragma pack(pop)
 
-}}} // end namespace pie::hac::detail
+} // namespace detail
+} // namespace hac
+} // namespace pie

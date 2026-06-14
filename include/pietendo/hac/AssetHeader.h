@@ -1,79 +1,80 @@
-	/**
-	 * @file AssetHeader.h
-	 * @brief Declaration of pie::hac::AssetHeader
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/28
-	 **/
+/**
+ * @file AssetHeader.h
+ * @brief Declaration of pie::hac::AssetHeader
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/28
+ **/
 #pragma once
 #include <pietendo/hac/define/aset.h>
 
-namespace pie { namespace hac {
-	
+namespace pie
+{
+namespace hac
+{
+
 class AssetHeader
 {
-public:
-	struct sSection
-	{
-		int64_t offset;
-		int64_t size;
+  public:
+    struct sSection
+    {
+        int64_t offset;
+        int64_t size;
 
-		sSection() :
-			offset(0),
-			size(0)
-		{}
+        sSection() : offset(0), size(0) {}
 
-		void operator=(const sSection& other)
-		{
-			offset = other.offset;
-			size = other.size;
-		}
+        void operator=(const sSection &other)
+        {
+            offset = other.offset;
+            size = other.size;
+        }
 
-		bool operator==(const sSection& other) const
-		{
-			return (offset == other.offset) \
-				&& (size == other.size);
-		}
+        bool operator==(const sSection &other) const
+        {
+            return (offset == other.offset) && (size == other.size);
+        }
 
-		bool operator!=(const sSection& other) const
-		{
-			return !operator==(other);
-		}
-	};
+        bool operator!=(const sSection &other) const
+        {
+            return !operator==(other);
+        }
+    };
 
-	AssetHeader();
-	AssetHeader(const AssetHeader& other);
+    AssetHeader();
+    AssetHeader(const AssetHeader &other);
 
-	void operator=(const AssetHeader& other);
-	bool operator==(const AssetHeader& other) const;
-	bool operator!=(const AssetHeader& other) const;
+    void operator=(const AssetHeader &other);
+    bool operator==(const AssetHeader &other) const;
+    bool operator!=(const AssetHeader &other) const;
 
-	// IByteModel
-	void toBytes();
-	void fromBytes(const byte_t* bytes, size_t len);
-	const tc::ByteData& getBytes() const;
+    // IByteModel
+    void toBytes();
+    void fromBytes(const byte_t *bytes, size_t len);
+    const tc::ByteData &getBytes() const;
 
-	// variables
-	void clear();
+    // variables
+    void clear();
 
-	const sSection& getIconInfo() const;
-	void setIconInfo(const sSection& info);
+    const sSection &getIconInfo() const;
+    void setIconInfo(const sSection &info);
 
-	const sSection& getNacpInfo() const;
-	void setNacpInfo(const sSection& info);
+    const sSection &getNacpInfo() const;
+    void setNacpInfo(const sSection &info);
 
-	const sSection& getRomfsInfo() const;
-	void setRomfsInfo(const sSection& info);
-private:
-	const std::string kModuleName = "NRO_ASSET_HEADER";
+    const sSection &getRomfsInfo() const;
+    void setRomfsInfo(const sSection &info);
 
-	// binary
-	tc::ByteData mRawBinary;
+  private:
+    const std::string kModuleName = "NRO_ASSET_HEADER";
 
-	// data
-	sSection mIconInfo;
-	sSection mNacpInfo;
-	sSection mRomfsInfo;
+    // binary
+    tc::ByteData mRawBinary;
+
+    // data
+    sSection mIconInfo;
+    sSection mNacpInfo;
+    sSection mRomfsInfo;
 };
 
-}} // namespace pie::hac
+} // namespace hac
+} // namespace pie

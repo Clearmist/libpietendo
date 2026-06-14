@@ -1,142 +1,135 @@
-	/**
-	 * @file SignedData.h
-	 * @brief Declaration of pie::hac::es::SignedData
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/28
-	 **/
+/**
+ * @file SignedData.h
+ * @brief Declaration of pie::hac::es::SignedData
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/28
+ **/
 #pragma once
-#include <tc/types.h>
 #include <pietendo/hac/es/SignatureBlock.h>
+#include <tc/types.h>
 
-namespace pie { namespace hac { namespace es {
-
-template <class T>
-class SignedData
+namespace pie
 {
-public:
-	SignedData();
-	SignedData(const SignedData& other);
+namespace hac
+{
+namespace es
+{
 
-	void operator=(const SignedData& other);
-	bool operator==(const SignedData& other) const;
-	bool operator!=(const SignedData& other) const;
+template <class T> class SignedData
+{
+  public:
+    SignedData();
+    SignedData(const SignedData &other);
 
-	// export/import
-	void toBytes();
-	void fromBytes(const byte_t* src, size_t size);
-	const tc::ByteData& getBytes() const;
+    void operator=(const SignedData &other);
+    bool operator==(const SignedData &other) const;
+    bool operator!=(const SignedData &other) const;
 
-	// variables
-	void clear();
+    // export/import
+    void toBytes();
+    void fromBytes(const byte_t *src, size_t size);
+    const tc::ByteData &getBytes() const;
 
-	const es::SignatureBlock& getSignature() const;
-	void setSignature(const SignatureBlock& signature);
+    // variables
+    void clear();
 
-	const T& getBody() const;
-	void setBody(const T& body);
-private:
-	const std::string kModuleName = "SIGNED_DATA";
+    const es::SignatureBlock &getSignature() const;
+    void setSignature(const SignatureBlock &signature);
 
-	// raw binary
-	tc::ByteData mRawBinary;
+    const T &getBody() const;
+    void setBody(const T &body);
 
-	// variables
-	SignatureBlock mSignature;
-	T mBody;
+  private:
+    const std::string kModuleName = "SIGNED_DATA";
+
+    // raw binary
+    tc::ByteData mRawBinary;
+
+    // variables
+    SignatureBlock mSignature;
+    T mBody;
 };
 
-template <class T>
-inline SignedData<T>::SignedData()
+template <class T> inline SignedData<T>::SignedData()
 {
-	clear();
+    clear();
 }
 
-template <class T>
-inline SignedData<T>::SignedData(const SignedData& other)
+template <class T> inline SignedData<T>::SignedData(const SignedData &other)
 {
-	*this = other;
+    *this = other;
 }
 
-template <class T>
-inline void SignedData<T>::operator=(const SignedData& other)
+template <class T> inline void SignedData<T>::operator=(const SignedData &other)
 {
-	mRawBinary = other.mRawBinary;
-	mSignature = other.mSignature;
-	mBody = other.mBody;
+    mRawBinary = other.mRawBinary;
+    mSignature = other.mSignature;
+    mBody = other.mBody;
 }
 
-template <class T>
-inline bool SignedData<T>::operator==(const SignedData& other) const
+template <class T> inline bool SignedData<T>::operator==(const SignedData &other) const
 {
-	return (mSignature == other.mSignature) \
-		&& (mBody == other.mBody);
+    return (mSignature == other.mSignature) && (mBody == other.mBody);
 }
 
-template <class T>
-inline bool SignedData<T>::operator!=(const SignedData& other) const
+template <class T> inline bool SignedData<T>::operator!=(const SignedData &other) const
 {
-	return !(*this == other);
+    return !(*this == other);
 }
 
-template <class T>
-inline void SignedData<T>::toBytes()
+template <class T> inline void SignedData<T>::toBytes()
 {
-	mSignature.toBytes();
-	mBody.toBytes();
+    mSignature.toBytes();
+    mBody.toBytes();
 
-	mRawBinary = tc::ByteData(mSignature.getBytes().size() + mBody.getBytes().size());
+    mRawBinary = tc::ByteData(mSignature.getBytes().size() + mBody.getBytes().size());
 
-	memcpy(mRawBinary.data(), mSignature.getBytes().data(), mSignature.getBytes().size());
-	memcpy(mRawBinary.data() + mSignature.getBytes().size(), mBody.getBytes().data(), mBody.getBytes().size());
+    memcpy(mRawBinary.data(), mSignature.getBytes().data(), mSignature.getBytes().size());
+    memcpy(mRawBinary.data() + mSignature.getBytes().size(), mBody.getBytes().data(), mBody.getBytes().size());
 }
 
-template <class T>
-inline void SignedData<T>::fromBytes(const byte_t* src, size_t size)
+template <class T> inline void SignedData<T>::fromBytes(const byte_t *src, size_t size)
 {
-	mSignature.fromBytes(src, size);
-	mBody.fromBytes(src + mSignature.getBytes().size(), size - mSignature.getBytes().size());
+    mSignature.fromBytes(src, size);
+    mBody.fromBytes(src + mSignature.getBytes().size(), size - mSignature.getBytes().size());
 
-	mRawBinary = tc::ByteData(mSignature.getBytes().size() + mBody.getBytes().size());
-	memcpy(mRawBinary.data(), src, mRawBinary.size());
+    mRawBinary = tc::ByteData(mSignature.getBytes().size() + mBody.getBytes().size());
+    memcpy(mRawBinary.data(), src, mRawBinary.size());
 }
 
-template <class T>
-inline const tc::ByteData& SignedData<T>::getBytes() const
+template <class T> inline const tc::ByteData &SignedData<T>::getBytes() const
 {
-	return mRawBinary;
+    return mRawBinary;
 }
 
-template <class T>
-inline void SignedData<T>::clear()
+template <class T> inline void SignedData<T>::clear()
 {
-	mRawBinary = tc::ByteData();
-	mSignature.clear();
-	mBody.clear();
+    mRawBinary = tc::ByteData();
+    mSignature.clear();
+    mBody.clear();
 }
 
-template <class T>
-inline const es::SignatureBlock& SignedData<T>::getSignature() const
+template <class T> inline const es::SignatureBlock &SignedData<T>::getSignature() const
 {
-	return mSignature;
+    return mSignature;
 }
 
-template <class T>
-inline void SignedData<T>::setSignature(const SignatureBlock& signature)
+template <class T> inline void SignedData<T>::setSignature(const SignatureBlock &signature)
 {
-	mSignature = signature;
+    mSignature = signature;
 }
 
-template <class T>
-inline const T& SignedData<T>::getBody() const
+template <class T> inline const T &SignedData<T>::getBody() const
 {
-	return mBody;
+    return mBody;
 }
 
-template <class T>
-inline void SignedData<T>::setBody(const T& body)
+template <class T> inline void SignedData<T>::setBody(const T &body)
 {
-	mBody = body;
+    mBody = body;
 }
 
-}}} // namespace pie::hac::es
+} // namespace es
+} // namespace hac
+} // namespace pie

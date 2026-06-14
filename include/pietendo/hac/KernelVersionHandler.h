@@ -1,44 +1,47 @@
-	/**
-	 * @file KernelVersionHandler.h
-	 * @brief Declaration of pie::hac::KernelVersionHandler
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/28
-	 **/
+/**
+ * @file KernelVersionHandler.h
+ * @brief Declaration of pie::hac::KernelVersionHandler
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/28
+ **/
 #pragma once
 #include <pietendo/hac/IKernelCapabilityHandler.h>
 #include <pietendo/hac/KernelVersionEntry.h>
 
-namespace pie { namespace hac {
-	
-class KernelVersionHandler :
-	public IKernelCapabilityHandler
+namespace pie
 {
-public:
-	KernelVersionHandler();
+namespace hac
+{
 
-	void operator=(const KernelVersionHandler& other);
-	bool operator==(const KernelVersionHandler& other) const;
-	bool operator!=(const KernelVersionHandler& other) const;
+class KernelVersionHandler : public IKernelCapabilityHandler
+{
+  public:
+    KernelVersionHandler();
 
-	// kernel capabilty list in/out
-	void importKernelCapabilityList(const std::vector<KernelCapabilityEntry>& caps);
-	void exportKernelCapabilityList(std::vector<KernelCapabilityEntry>& caps) const;
-	void clear();
-	bool isSet() const;
+    void operator=(const KernelVersionHandler &other);
+    bool operator==(const KernelVersionHandler &other) const;
+    bool operator!=(const KernelVersionHandler &other) const;
 
-	// variables
-	uint16_t getVerMajor() const;
-	void setVerMajor(uint16_t major);
-	uint8_t getVerMinor() const;
-	void setVerMinor(uint8_t minor);
+    // kernel capabilty list in/out
+    void importKernelCapabilityList(const std::vector<KernelCapabilityEntry> &caps);
+    void exportKernelCapabilityList(std::vector<KernelCapabilityEntry> &caps) const;
+    void clear();
+    bool isSet() const;
 
-private:
-	const std::string kModuleName = "KERNEL_VERSION_HANDLER";
-	static const size_t kMaxKernelCapNum = 1;
+    // variables
+    uint16_t getVerMajor() const;
+    void setVerMajor(uint16_t major);
+    uint8_t getVerMinor() const;
+    void setVerMinor(uint8_t minor);
 
-	bool mIsSet;
-	KernelVersionEntry mEntry;
+  private:
+    const std::string kModuleName = "KERNEL_VERSION_HANDLER";
+    static const size_t kMaxKernelCapNum = 1;
+
+    bool mIsSet;
+    KernelVersionEntry mEntry;
 };
 
-}} // namespace pie::hac
+} // namespace hac
+} // namespace pie

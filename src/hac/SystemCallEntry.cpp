@@ -1,92 +1,81 @@
 #include <pietendo/hac/SystemCallEntry.h>
 
-pie::hac::SystemCallEntry::SystemCallEntry() :
-	mCap(kCapId),
-	mSystemCallUpper(0),
-	mSystemCallLower(0)
-{
+pie::hac::SystemCallEntry::SystemCallEntry() : mCap(kCapId), mSystemCallUpper(0), mSystemCallLower(0) {}
 
+pie::hac::SystemCallEntry::SystemCallEntry(const KernelCapabilityEntry &kernel_cap)
+    : mCap(kCapId), mSystemCallUpper(0), mSystemCallLower(0)
+{
+    setKernelCapability(kernel_cap);
 }
 
-pie::hac::SystemCallEntry::SystemCallEntry(const KernelCapabilityEntry & kernel_cap) :
-	mCap(kCapId),
-	mSystemCallUpper(0),
-	mSystemCallLower(0)
+pie::hac::SystemCallEntry::SystemCallEntry(uint32_t upper_bits, uint32_t lower_bits)
+    : mCap(kCapId), mSystemCallUpper(0), mSystemCallLower(0)
 {
-	setKernelCapability(kernel_cap);
+    setSystemCallUpperBits(upper_bits);
+    setSystemCallLowerBits(lower_bits);
 }
 
-pie::hac::SystemCallEntry::SystemCallEntry(uint32_t upper_bits, uint32_t lower_bits) :
-	mCap(kCapId),
-	mSystemCallUpper(0),
-	mSystemCallLower(0)
+void pie::hac::SystemCallEntry::operator=(const SystemCallEntry &other)
 {
-	setSystemCallUpperBits(upper_bits);
-	setSystemCallLowerBits(lower_bits);
+    mSystemCallUpper = other.mSystemCallUpper;
+    mSystemCallLower = other.mSystemCallLower;
+    updateCapField();
 }
 
-void pie::hac::SystemCallEntry::operator=(const SystemCallEntry& other)
+bool pie::hac::SystemCallEntry::operator==(const SystemCallEntry &other) const
 {
-	mSystemCallUpper = other.mSystemCallUpper;
-	mSystemCallLower = other.mSystemCallLower;
-	updateCapField();
+    return (mSystemCallUpper == other.mSystemCallUpper) && (mSystemCallLower == other.mSystemCallLower);
 }
 
-bool pie::hac::SystemCallEntry::operator==(const SystemCallEntry& other) const
+bool pie::hac::SystemCallEntry::operator!=(const SystemCallEntry &other) const
 {
-	return (mSystemCallUpper == other.mSystemCallUpper) \
-		&& (mSystemCallLower == other.mSystemCallLower);
+    return !(*this == other);
 }
 
-bool pie::hac::SystemCallEntry::operator!=(const SystemCallEntry& other) const
+const pie::hac::KernelCapabilityEntry &pie::hac::SystemCallEntry::getKernelCapability() const
 {
-	return !(*this == other);
+    return mCap;
 }
 
-const pie::hac::KernelCapabilityEntry & pie::hac::SystemCallEntry::getKernelCapability() const
+void pie::hac::SystemCallEntry::setKernelCapability(const KernelCapabilityEntry &kernel_cap)
 {
-	return mCap;
-}
+    if (kernel_cap.getType() != kCapId)
+    {
+        throw tc::ArgumentOutOfRangeException(kModuleName, "KernelCapabilityEntry is not type 'EnableSystemCalls'");
+    }
 
-void pie::hac::SystemCallEntry::setKernelCapability(const KernelCapabilityEntry & kernel_cap)
-{
-	if (kernel_cap.getType() != kCapId)
-	{
-		throw tc::ArgumentOutOfRangeException(kModuleName, "KernelCapabilityEntry is not type 'EnableSystemCalls'");
-	}
-
-	mCap = kernel_cap;
-	processCapField();
+    mCap = kernel_cap;
+    processCapField();
 }
 
 uint32_t pie::hac::SystemCallEntry::getSystemCallUpperBits() const
 {
-	return mSystemCallUpper;
+    return mSystemCallUpper;
 }
 
 void pie::hac::SystemCallEntry::setSystemCallUpperBits(uint32_t upper_bits)
 {
-	if (upper_bits > kSysCallUpperMax)
-	{
-		throw tc::ArgumentOutOfRangeException(kModuleName, "Illegal SystemCall upper bits.");
-	}
+    if (upper_bits > kSysCallUpperMax)
+    {
+        throw tc::ArgumentOutOfRangeException(kModuleName, "Illegal SystemCall upper bits.");
+    }
 
-	mSystemCallUpper = upper_bits;
-	updateCapField();
+    mSystemCallUpper = upper_bits;
+    updateCapField();
 }
 
 uint32_t pie::hac::SystemCallEntry::getSystemCallLowerBits() const
 {
-	return mSystemCallLower;
+    return mSystemCallLower;
 }
 
 void pie::hac::SystemCallEntry::setSystemCallLowerBits(uint32_t lower_bits)
 {
-	if (lower_bits > kSysCallLowerMax)
-	{
-		throw tc::ArgumentOutOfRangeException(kModuleName, "Illegal SystemCall upper bits.");
-	}
+    if (lower_bits > kSysCallLowerMax)
+    {
+        throw tc::ArgumentOutOfRangeException(kModuleName, "Illegal SystemCall upper bits.");
+    }
 
-	mSystemCallLower = lower_bits;
-	updateCapField();
+    mSystemCallLower = lower_bits;
+    updateCapField();
 }

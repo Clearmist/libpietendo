@@ -6,7 +6,7 @@ project(libpietendo
 )
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Platform detection

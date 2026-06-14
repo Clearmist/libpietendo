@@ -1,37 +1,48 @@
-	/**
-	 * @file RomFsSnapshotGenerator.h
-	 * @brief Declaration of pie::ctr::RomFsSnapshotGenerator
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/27
-	 **/
+/**
+ * @file RomFsSnapshotGenerator.h
+ * @brief Declaration of pie::ctr::RomFsSnapshotGenerator
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/27
+ **/
 #pragma once
+#include <pietendo/ctr/romfs.h>
 #include <tc/ByteData.h>
 #include <tc/io/VirtualFileSystem.h>
-#include <pietendo/ctr/romfs.h>
 
-namespace pie { namespace ctr {
+namespace pie
+{
+namespace ctr
+{
 
 struct RomFsSnapshotGenerator : public tc::io::VirtualFileSystem::FileSystemSnapshot
 {
-public:
-	RomFsSnapshotGenerator(const std::shared_ptr<tc::io::IStream>& stream);
-private:
-	RomFsSnapshotGenerator();
+  public:
+    RomFsSnapshotGenerator(const std::shared_ptr<tc::io::IStream> &stream);
 
-	std::shared_ptr<tc::io::IStream> mBaseStream;
+  private:
+    RomFsSnapshotGenerator();
 
-	int64_t mDataOffset;
+    std::shared_ptr<tc::io::IStream> mBaseStream;
 
-	tc::ByteData mDirEntryTable;
-	std::map<uint32_t, size_t> mDirParentVaddrMap;
-	inline pie::ctr::RomFsDirectoryEntry* getDirEntry(uint32_t vaddr) { return (pie::ctr::RomFsDirectoryEntry*)(mDirEntryTable.data() + vaddr); }
+    int64_t mDataOffset;
 
-	tc::ByteData mFileEntryTable;
-	inline pie::ctr::RomFsFileEntry* getFileEntry(uint32_t vaddr) { return (pie::ctr::RomFsFileEntry*)(mFileEntryTable.data() + vaddr); }
+    tc::ByteData mDirEntryTable;
+    std::map<uint32_t, size_t> mDirParentVaddrMap;
+    inline pie::ctr::RomFsDirectoryEntry *getDirEntry(uint32_t vaddr)
+    {
+        return (pie::ctr::RomFsDirectoryEntry *)(mDirEntryTable.data() + vaddr);
+    }
 
-	void addFile(const pie::ctr::RomFsFileEntry* file_entry, size_t parent_dir);
-	void addDirectory(const pie::ctr::RomFsDirectoryEntry* dir_entry, size_t parent_dir);
+    tc::ByteData mFileEntryTable;
+    inline pie::ctr::RomFsFileEntry *getFileEntry(uint32_t vaddr)
+    {
+        return (pie::ctr::RomFsFileEntry *)(mFileEntryTable.data() + vaddr);
+    }
+
+    void addFile(const pie::ctr::RomFsFileEntry *file_entry, size_t parent_dir);
+    void addDirectory(const pie::ctr::RomFsDirectoryEntry *dir_entry, size_t parent_dir);
 };
 
-}} // namespace pie::ctr
+} // namespace ctr
+} // namespace pie

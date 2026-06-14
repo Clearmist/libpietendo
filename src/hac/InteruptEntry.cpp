@@ -1,78 +1,68 @@
 #include <pietendo/hac/InteruptEntry.h>
 
-pie::hac::InteruptEntry::InteruptEntry() :
-	mCap(kCapId),
-	mInterupt{0,0}
+pie::hac::InteruptEntry::InteruptEntry() : mCap(kCapId), mInterupt{0, 0} {}
+
+pie::hac::InteruptEntry::InteruptEntry(const KernelCapabilityEntry &kernel_cap) : mCap(kCapId), mInterupt{0, 0}
 {
-	
+    setKernelCapability(kernel_cap);
 }
 
-pie::hac::InteruptEntry::InteruptEntry(const KernelCapabilityEntry & kernel_cap) :
-	mCap(kCapId),
-	mInterupt{ 0,0 }
+pie::hac::InteruptEntry::InteruptEntry(uint32_t interupt0, uint32_t interupt1) : mCap(kCapId), mInterupt{0, 0}
 {
-	setKernelCapability(kernel_cap);
+    setInterupt(0, interupt0);
+    setInterupt(1, interupt1);
 }
 
-pie::hac::InteruptEntry::InteruptEntry(uint32_t interupt0, uint32_t interupt1) :
-	mCap(kCapId),
-	mInterupt{ 0,0 }
+void pie::hac::InteruptEntry::operator=(const InteruptEntry &other)
 {
-	setInterupt(0, interupt0);
-	setInterupt(1, interupt1);
+    mInterupt[0] = other.mInterupt[0];
+    mInterupt[1] = other.mInterupt[1];
+    updateCapField();
 }
 
-void pie::hac::InteruptEntry::operator=(const InteruptEntry& other)
+bool pie::hac::InteruptEntry::operator==(const InteruptEntry &other) const
 {
-	mInterupt[0] = other.mInterupt[0];
-	mInterupt[1] = other.mInterupt[1];
-	updateCapField();
+    return (mInterupt[0] == other.mInterupt[0]) && (mInterupt[1] == other.mInterupt[1]);
 }
 
-bool pie::hac::InteruptEntry::operator==(const InteruptEntry& other) const
+bool pie::hac::InteruptEntry::operator!=(const InteruptEntry &other) const
 {
-	return (mInterupt[0] == other.mInterupt[0]) \
-		&& (mInterupt[1] == other.mInterupt[1]);
+    return !(*this == other);
 }
 
-bool pie::hac::InteruptEntry::operator!=(const InteruptEntry& other) const
+const pie::hac::KernelCapabilityEntry &pie::hac::InteruptEntry::getKernelCapability() const
 {
-	return !(*this == other);
+    return mCap;
 }
 
-const pie::hac::KernelCapabilityEntry & pie::hac::InteruptEntry::getKernelCapability() const
+void pie::hac::InteruptEntry::setKernelCapability(const KernelCapabilityEntry &kernel_cap)
 {
-	return mCap;
-}
+    if (kernel_cap.getType() != kCapId)
+    {
+        throw tc::ArgumentOutOfRangeException(kModuleName, "KernelCapabilityEntry is not type 'EnableInterupts'");
+    }
 
-void pie::hac::InteruptEntry::setKernelCapability(const KernelCapabilityEntry & kernel_cap)
-{
-	if (kernel_cap.getType() != kCapId)
-	{
-		throw tc::ArgumentOutOfRangeException(kModuleName, "KernelCapabilityEntry is not type 'EnableInterupts'");
-	}
-
-	mCap = kernel_cap;
-	processCapField();
+    mCap = kernel_cap;
+    processCapField();
 }
 
 uint32_t pie::hac::InteruptEntry::operator[](size_t index) const
 {
-	return getInterupt(index);
+    return getInterupt(index);
 }
 
 uint32_t pie::hac::InteruptEntry::getInterupt(size_t index) const
 {
-	return mInterupt[index % kInteruptNum];
+    return mInterupt[index % kInteruptNum];
 }
 
 void pie::hac::InteruptEntry::setInterupt(size_t index, uint32_t interupt)
 {
-	if (interupt > kInteruptMax)
-	{
-		throw tc::ArgumentOutOfRangeException(kModuleName, "Illegal interupt value.");
-	}
+    if (interupt > kInteruptMax)
+    {
+        throw tc::ArgumentOutOfRangeException(kModuleName, "Illegal interupt value.");
+    }
 
-	mInterupt[index % kInteruptNum] = interupt;
-	updateCapField();
+    mInterupt[index % kInteruptNum] = interupt;
+    updateCapField();
 }

@@ -1,143 +1,135 @@
-	/**
-	 * @file NsoHeader.h
-	 * @brief Declaration of pie::hac::NsoHeader
-	 * @author Jack (jakcron)
-	 * @version 0.1
-	 * @date 2022/06/28
-	 **/
+/**
+ * @file NsoHeader.h
+ * @brief Declaration of pie::hac::NsoHeader
+ * @author Jack (jakcron)
+ * @version 0.1
+ * @date 2022/06/28
+ **/
 #pragma once
 #include <pietendo/hac/define/nso.h>
 
-namespace pie { namespace hac {
-	
+namespace pie
+{
+namespace hac
+{
+
 class NsoHeader
 {
-public:
-	struct sLayout
-	{
-		uint32_t offset;
-		uint32_t size;
+  public:
+    struct sLayout
+    {
+        uint32_t offset;
+        uint32_t size;
 
-		sLayout() :
-			offset(0),
-			size(0)
-		{}
+        sLayout() : offset(0), size(0) {}
 
-		void operator=(const sLayout& other)
-		{
-			offset = other.offset;
-			size = other.size;
-		}
+        void operator=(const sLayout &other)
+        {
+            offset = other.offset;
+            size = other.size;
+        }
 
-		bool operator==(const sLayout& other) const
-		{
-			return (offset == other.offset) \
-				&& (size == other.size);
-		}
+        bool operator==(const sLayout &other) const
+        {
+            return (offset == other.offset) && (size == other.size);
+        }
 
-		bool operator!=(const sLayout& other) const
-		{
-			return !(*this == other);
-		}
-	};
+        bool operator!=(const sLayout &other) const
+        {
+            return !(*this == other);
+        }
+    };
 
-	struct sCodeSegment
-	{
-		sLayout file_layout;
-		sLayout memory_layout;
-		bool is_compressed;
-		bool is_hashed;
-		detail::sha256_hash_t hash;
+    struct sCodeSegment
+    {
+        sLayout file_layout;
+        sLayout memory_layout;
+        bool is_compressed;
+        bool is_hashed;
+        detail::sha256_hash_t hash;
 
-		sCodeSegment() :
-			file_layout(),
-			memory_layout(),
-			is_compressed(false),
-			is_hashed(false),
-			hash({0})
-		{}
-		
-		void operator=(const sCodeSegment& other)
-		{
-			file_layout = other.file_layout;
-			memory_layout = other.memory_layout;
-			is_compressed = other.is_compressed;
-			is_hashed = other.is_hashed;
-			hash = other.hash;
-		}
+        sCodeSegment() : file_layout(), memory_layout(), is_compressed(false), is_hashed(false), hash({0}) {}
 
-		bool operator==(const sCodeSegment& other) const
-		{
-			return (file_layout == other.file_layout) \
-				&& (memory_layout == other.memory_layout) \
-				&& (is_compressed == other.is_compressed) \
-				&& (is_hashed == other.is_hashed) \
-				&& (hash == other.hash);
-		}
+        void operator=(const sCodeSegment &other)
+        {
+            file_layout = other.file_layout;
+            memory_layout = other.memory_layout;
+            is_compressed = other.is_compressed;
+            is_hashed = other.is_hashed;
+            hash = other.hash;
+        }
 
-		bool operator!=(const sCodeSegment& other) const
-		{
-			return !(*this == other);
-		}
-	};
+        bool operator==(const sCodeSegment &other) const
+        {
+            return (file_layout == other.file_layout) && (memory_layout == other.memory_layout) &&
+                   (is_compressed == other.is_compressed) && (is_hashed == other.is_hashed) && (hash == other.hash);
+        }
 
-	NsoHeader();
-	NsoHeader(const NsoHeader& other);
+        bool operator!=(const sCodeSegment &other) const
+        {
+            return !(*this == other);
+        }
+    };
 
-	void operator=(const NsoHeader& other);
-	bool operator==(const NsoHeader& other) const;
-	bool operator!=(const NsoHeader& other) const;
+    NsoHeader();
+    NsoHeader(const NsoHeader &other);
 
-	// IByteModel
-	void toBytes();
-	void fromBytes(const byte_t* bytes, size_t len);
-	const tc::ByteData& getBytes() const;
+    void operator=(const NsoHeader &other);
+    bool operator==(const NsoHeader &other) const;
+    bool operator!=(const NsoHeader &other) const;
 
-	// variables
-	void clear();
-	
-	const pie::hac::detail::module_id_t& getModuleId() const;
-	void setModuleId(const pie::hac::detail::module_id_t& id);
+    // IByteModel
+    void toBytes();
+    void fromBytes(const byte_t *bytes, size_t len);
+    const tc::ByteData &getBytes() const;
 
-	uint32_t getBssSize() const;
-	void setBssSize(uint32_t size);
+    // variables
+    void clear();
 
-	const sCodeSegment& getTextSegmentInfo() const;
-	void setTextSegmentInfo(const sCodeSegment& info);
+    const pie::hac::detail::module_id_t &getModuleId() const;
+    void setModuleId(const pie::hac::detail::module_id_t &id);
 
-	const sCodeSegment& getRoSegmentInfo() const;
-	void setRoSegmentInfo(const sCodeSegment& info);
+    uint32_t getBssSize() const;
+    void setBssSize(uint32_t size);
 
-	const sCodeSegment& getDataSegmentInfo() const;
-	void setDataSegmentInfo(const sCodeSegment& info);
+    const sCodeSegment &getTextSegmentInfo() const;
+    void setTextSegmentInfo(const sCodeSegment &info);
 
-	const sLayout& getModuleNameInfo() const;
-	void setModuleNameInfo(const sLayout& info);
+    const sCodeSegment &getRoSegmentInfo() const;
+    void setRoSegmentInfo(const sCodeSegment &info);
 
-	const sLayout& getRoEmbeddedInfo() const;
-	void setRoEmbeddedInfo(const sLayout& info);
+    const sCodeSegment &getDataSegmentInfo() const;
+    void setDataSegmentInfo(const sCodeSegment &info);
 
-	const sLayout& getRoDynStrInfo() const;
-	void setRoDynStrInfo(const sLayout& info);
+    const sLayout &getModuleNameInfo() const;
+    void setModuleNameInfo(const sLayout &info);
 
-	const sLayout& getRoDynSymInfo() const;
-	void setRoDynSymInfo(const sLayout& info);
-private:
-	const std::string kModuleName = "NSO_HEADER";
+    const sLayout &getRoEmbeddedInfo() const;
+    void setRoEmbeddedInfo(const sLayout &info);
 
-	// binary
-	tc::ByteData mRawBinary;
+    const sLayout &getRoDynStrInfo() const;
+    void setRoDynStrInfo(const sLayout &info);
 
-	// data
-	pie::hac::detail::module_id_t mModuleId;
-	uint32_t mBssSize;
-	sCodeSegment mTextSegmentInfo;
-	sCodeSegment mRoSegmentInfo;
-	sCodeSegment mDataSegmentInfo;
-	sLayout mModuleNameInfo;
-	sLayout mRoEmbeddedInfo;
-	sLayout mRoDynStrInfo;
-	sLayout mRoDynSymInfo;
+    const sLayout &getRoDynSymInfo() const;
+    void setRoDynSymInfo(const sLayout &info);
+
+  private:
+    const std::string kModuleName = "NSO_HEADER";
+
+    // binary
+    tc::ByteData mRawBinary;
+
+    // data
+    pie::hac::detail::module_id_t mModuleId;
+    uint32_t mBssSize;
+    sCodeSegment mTextSegmentInfo;
+    sCodeSegment mRoSegmentInfo;
+    sCodeSegment mDataSegmentInfo;
+    sLayout mModuleNameInfo;
+    sLayout mRoEmbeddedInfo;
+    sLayout mRoDynStrInfo;
+    sLayout mRoDynSymInfo;
 };
 
-}} // namespace pie::hac
+} // namespace hac
+} // namespace pie

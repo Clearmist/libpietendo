@@ -1,101 +1,97 @@
-#include <pietendo/hac/SystemCallHandler.h>
 #include <pietendo/hac/SystemCallEntry.h>
+#include <pietendo/hac/SystemCallHandler.h>
 
-pie::hac::SystemCallHandler::SystemCallHandler() :
-	mIsSet(false),
-	mSystemCallIds()
-{}
+pie::hac::SystemCallHandler::SystemCallHandler() : mIsSet(false), mSystemCallIds() {}
 
-void pie::hac::SystemCallHandler::operator=(const SystemCallHandler & other)
+void pie::hac::SystemCallHandler::operator=(const SystemCallHandler &other)
 {
-	mIsSet = other.mIsSet;
-	mSystemCallIds = other.mSystemCallIds;
+    mIsSet = other.mIsSet;
+    mSystemCallIds = other.mSystemCallIds;
 }
 
-bool pie::hac::SystemCallHandler::operator==(const SystemCallHandler & other) const
+bool pie::hac::SystemCallHandler::operator==(const SystemCallHandler &other) const
 {
-	return (mIsSet == other.mIsSet) \
-		&& (mSystemCallIds == other.mSystemCallIds);
+    return (mIsSet == other.mIsSet) && (mSystemCallIds == other.mSystemCallIds);
 }
 
-bool pie::hac::SystemCallHandler::operator!=(const SystemCallHandler & other) const
+bool pie::hac::SystemCallHandler::operator!=(const SystemCallHandler &other) const
 {
-	return !(*this == other);
+    return !(*this == other);
 }
 
-void pie::hac::SystemCallHandler::importKernelCapabilityList(const std::vector<KernelCapabilityEntry>& caps)
+void pie::hac::SystemCallHandler::importKernelCapabilityList(const std::vector<KernelCapabilityEntry> &caps)
 {
-	if (caps.size() == 0)
-		return;
+    if (caps.size() == 0)
+        return;
 
-	SystemCallEntry entry;
+    SystemCallEntry entry;
 
-	uint8_t syscallUpper, syscall_id;
-	for (size_t i = 0; i < caps.size(); i++)
-	{
-		entry.setKernelCapability(caps[i]);
-		syscallUpper = byte_t(kEntrySyscallCount * entry.getSystemCallUpperBits());
-		for (uint8_t j = 0; j < kEntrySyscallCount; j++)
-		{
-			syscall_id = syscallUpper + j;
-			if (((entry.getSystemCallLowerBits() >> j) & 1) == 1)
-			{
-				mSystemCallIds.set(syscall_id);
-			}
-		}
-	}
+    uint8_t syscallUpper, syscall_id;
+    for (size_t i = 0; i < caps.size(); i++)
+    {
+        entry.setKernelCapability(caps[i]);
+        syscallUpper = byte_t(kEntrySyscallCount * entry.getSystemCallUpperBits());
+        for (uint8_t j = 0; j < kEntrySyscallCount; j++)
+        {
+            syscall_id = syscallUpper + j;
+            if (((entry.getSystemCallLowerBits() >> j) & 1) == 1)
+            {
+                mSystemCallIds.set(syscall_id);
+            }
+        }
+    }
 
-
-	mIsSet = true;
+    mIsSet = true;
 }
 
-void pie::hac::SystemCallHandler::exportKernelCapabilityList(std::vector<KernelCapabilityEntry>& caps) const
+void pie::hac::SystemCallHandler::exportKernelCapabilityList(std::vector<KernelCapabilityEntry> &caps) const
 {
-	if (isSet() == false)
-		return;
+    if (isSet() == false)
+        return;
 
-	SystemCallEntry entries[kSyscallTotalEntryNum];
-	for (size_t i = 0; i < kSyscallTotalEntryNum; i++)
-	{
-		entries[i].setSystemCallUpperBits((uint32_t)i);
-		entries[i].setSystemCallLowerBits(0);
-	}
+    SystemCallEntry entries[kSyscallTotalEntryNum];
+    for (size_t i = 0; i < kSyscallTotalEntryNum; i++)
+    {
+        entries[i].setSystemCallUpperBits((uint32_t)i);
+        entries[i].setSystemCallLowerBits(0);
+    }
 
-	for (size_t syscall_id = 0; syscall_id < mSystemCallIds.size(); syscall_id++)
-	{
-		if (mSystemCallIds.test(syscall_id) == false)
-			continue;
+    for (size_t syscall_id = 0; syscall_id < mSystemCallIds.size(); syscall_id++)
+    {
+        if (mSystemCallIds.test(syscall_id) == false)
+            continue;
 
-		entries[syscall_id / kEntrySyscallCount].setSystemCallLowerBits(entries[syscall_id / kEntrySyscallCount].getSystemCallLowerBits() | (1 << syscall_id % kEntrySyscallCount));
-	}
+        entries[syscall_id / kEntrySyscallCount].setSystemCallLowerBits(
+            entries[syscall_id / kEntrySyscallCount].getSystemCallLowerBits() | (1 << syscall_id % kEntrySyscallCount));
+    }
 
-	for (size_t i = 0; i < kSyscallTotalEntryNum; i++)
-	{
-		if (entries[i].getSystemCallLowerBits() != 0)
-		{
-			caps.push_back(entries[i].getKernelCapability());
-		}
-	}
+    for (size_t i = 0; i < kSyscallTotalEntryNum; i++)
+    {
+        if (entries[i].getSystemCallLowerBits() != 0)
+        {
+            caps.push_back(entries[i].getKernelCapability());
+        }
+    }
 }
 
 void pie::hac::SystemCallHandler::clear()
 {
-	mIsSet = false;
-	mSystemCallIds.reset();
+    mIsSet = false;
+    mSystemCallIds.reset();
 }
 
 bool pie::hac::SystemCallHandler::isSet() const
 {
-	return mIsSet;
+    return mIsSet;
 }
 
-const pie::hac::kc::SystemCallIds& pie::hac::SystemCallHandler::getSystemCallIds() const
+const pie::hac::kc::SystemCallIds &pie::hac::SystemCallHandler::getSystemCallIds() const
 {
-	return mSystemCallIds;
+    return mSystemCallIds;
 }
 
-void pie::hac::SystemCallHandler::setSystemCallIds(const pie::hac::kc::SystemCallIds& syscall_ids)
+void pie::hac::SystemCallHandler::setSystemCallIds(const pie::hac::kc::SystemCallIds &syscall_ids)
 {
-	mSystemCallIds = syscall_ids;
-	mIsSet = true;
+    mSystemCallIds = syscall_ids;
+    mIsSet = true;
 }
